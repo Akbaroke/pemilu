@@ -1,13 +1,13 @@
 import React from 'react';
 import { useRouter } from 'next/router';
-import Button from '@/components/Button';
-import Input from '@/components/Input';
-import Layout from '@/components/Layout';
-import { isEmail, useForm } from '@mantine/form';
-import { LoginFormType } from '@/types/auth';
-import { AxiosErrorResponse } from '@/interfaces/axios';
-import { signIn } from 'next-auth/react';
-import GoogleAuthButton from '@/components/GoogleAuthButton';
+import Button from '@/components/atoms/Button'
+import Input from '@/components/atoms/Input'
+import Layout from '@/components/templates/Layout'
+import { isEmail, useForm } from '@mantine/form'
+import { LoginFormType } from '@/types/auth'
+import { AxiosErrorResponse } from '@/interfaces/axios'
+import { signIn } from 'next-auth/react'
+import GoogleAuthButton from '@/components/atoms/GoogleAuthButton'
 import Link from 'next/link';
 
 export default function Login() {

@@ -1,13 +1,13 @@
 import React from 'react';
-import Button from '@/components/Button';
-import Input from '@/components/Input';
-import Layout from '@/components/Layout';
-import { isEmail, useForm } from '@mantine/form';
-import axios from 'axios';
-import { AxiosSuccessResponse } from '@/interfaces/axios';
-import { RegisterFormType } from '@/types/auth';
-import Link from 'next/link';
-import GoogleAuthButton from '@/components/GoogleAuthButton';
+import Button from '@/components/atoms/Button'
+import Input from '@/components/atoms/Input'
+import Layout from '@/components/templates/Layout'
+import { isEmail, useForm } from '@mantine/form'
+import axios from 'axios'
+import { AxiosSuccessResponse } from '@/interfaces/axios'
+import { RegisterFormType } from '@/types/auth'
+import Link from 'next/link'
+import GoogleAuthButton from '@/components/atoms/GoogleAuthButton'
 
 export default function Register() {
   const [isLoading, setIsLoading] = React.useState(false);

@@ -1,6 +1,6 @@
 import React from 'react';
-import Button from '@/components/Button';
-import Layout from '@/components/Layout';
+import Button from '@/components/atoms/Button'
+import Layout from '@/components/templates/Layout'
 import { useRouter } from 'next/router';
 import { BiTimer } from 'react-icons/bi';
 

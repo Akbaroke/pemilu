@@ -2,15 +2,15 @@ import * as React from 'react';
 import { useRouter } from 'next/router';
 import { Chart } from 'primereact/chart';
 import Image from 'next/image';
-import CopyBtn from '@/components/CopyBtn';
-import Layout from '@/components/Layout';
-import { Badge } from '@mantine/core';
-import { BiTimer } from 'react-icons/bi';
-import { VscDebugDisconnect } from 'react-icons/vsc';
-import { IoMdSettings } from 'react-icons/io';
-import PEMILU_IMAGE from '@/assets/pemilu-image.png';
-import formatCustomDate from '@/utils/formatCustomDate';
-import Button from '@/components/Button';
+import CopyBtn from '@/components/atoms/CopyBtn'
+import Layout from '@/components/templates/Layout'
+import { Badge } from '@mantine/core'
+import { BiTimer } from 'react-icons/bi'
+import { VscDebugDisconnect } from 'react-icons/vsc'
+import { IoMdSettings } from 'react-icons/io'
+import PEMILU_IMAGE from '@/assets/pemilu-image.png'
+import formatCustomDate from '@/utils/formatCustomDate'
+import Button from '@/components/atoms/Button'
 
 interface Pemilu {
   id: string;

@@ -1,24 +1,24 @@
 import * as React from 'react';
-import SearchInput from '@/components/SearchInput';
+import SearchInput from '@/components/atoms/SearchInput'
 import PEMILU_IMAGE from '@/assets/pemilu-image.png';
 import Image from 'next/image';
 import { BiTimer } from 'react-icons/bi';
 import { FiPlus } from 'react-icons/fi';
 import formatCustomDate from '@/utils/formatCustomDate';
 import Link from 'next/link';
-import Layout from '@/components/Layout';
-import { Tooltip } from '@mantine/core';
+import Layout from '@/components/templates/Layout'
+import { Tooltip } from '@mantine/core'
 
 interface Pemilu {
-  id: string;
-  slug: string;
-  usercreated_id: string;
-  name: string;
-  start: Date;
-  end: Date;
-  optionCount: number;
-  roomCount: number;
-  queueCount: number;
+  id: string
+  slug: string
+  usercreated_id: string
+  name: string
+  start: Date
+  end: Date
+  optionCount: number
+  roomCount: number
+  queueCount: number
 }
 
 const data: Pemilu[] = [
@@ -44,26 +44,31 @@ const data: Pemilu[] = [
     roomCount: 1,
     queueCount: 0,
   },
-];
+]
 
 export default function Home() {
-  const [pemilus, setPemilus] = React.useState<Pemilu[]>();
+  const [pemilus, setPemilus] = React.useState<Pemilu[]>()
 
   React.useEffect(() => {
-    setPemilus(data);
-  }, []);
+    setPemilus(data)
+  }, [])
 
   return (
     <Layout isLogoutBtn>
       <SearchInput placeholder="Cari.." />
       <div className="flex flex-col gap-3 mt-5">
         <Tooltip label="Buat Pemilu" withArrow position="bottom">
-          <Link href="/pemilu" className="rounded-[10px] border border-dashed border-two p-[15px] flex items-center justify-center gap-4 hover:shadow-md transition-all duration-300 cursor-pointer text-three">
+          <Link
+            href="/pemilu"
+            className="rounded-[10px] border border-dashed border-two p-[15px] flex items-center justify-center gap-4 hover:shadow-md transition-all duration-300 cursor-pointer text-three">
             <FiPlus size={30} />
           </Link>
         </Tooltip>
-        {pemilus?.map((pemilu) => (
-          <Link href={`/pemilu/${pemilu.slug}`} key={pemilu.id} className="rounded-[10px] border border-two p-[15px] flex items-center gap-4 shadow-md hover:shadow-sm transition-all duration-300 cursor-pointer">
+        {pemilus?.map(pemilu => (
+          <Link
+            href={`/pemilu/${pemilu.slug}`}
+            key={pemilu.id}
+            className="rounded-[10px] border border-two p-4 flex items-center gap-4 shadow-md hover:shadow-sm transition-all duration-300 cursor-pointer">
             <Image src={PEMILU_IMAGE} alt="image pemilu" className="w-[101px] h-[96px]" />
             <div className="flex flex-col justify-between gap-1">
               <h1 className="text-one text-[14px] font-semibold">{pemilu.name}</h1>
@@ -81,5 +86,5 @@ export default function Home() {
         ))}
       </div>
     </Layout>
-  );
+  )
 }
