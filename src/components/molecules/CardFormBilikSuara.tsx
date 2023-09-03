@@ -1,20 +1,17 @@
 import * as React from 'react'
 import Input from '../atoms/Input'
 import { isNotEmpty, useForm } from '@mantine/form'
-import InputImage from '../atoms/InputImage'
-import InputColor from '../atoms/InputColor'
 import { Accordion, LoadingOverlay } from '@mantine/core'
 import { IoIosArrowDown } from 'react-icons/io'
 import { PiTrashBold } from 'react-icons/pi'
 import { useDispatch, useSelector } from 'react-redux'
-import { deleteKandidats, setOrUpdateKandidats } from '@/redux/slices/createPemiluSlice'
+import { deleteBilikSuara, setOrUpdateBilikSuara } from '@/redux/slices/createPemiluSlice'
 import { useHover } from '@mantine/hooks'
 import { RootState } from '@/redux/store'
 
 type PemiluFormType = {
-  name: string
-  image: string
-  color: string
+  prepare: number
+  timer: number
 }
 
 type Props = {
@@ -22,39 +19,37 @@ type Props = {
   handleDeleteButton?: () => void
 }
 
-export default function CardFormKandidat({ number, handleDeleteButton }: Props) {
+export default function CardFormBilikSuara({ number, handleDeleteButton }: Props) {
   const dispatch = useDispatch()
   const [isExpanded, setIsExpanded] = React.useState(false)
   const { hovered, ref } = useHover()
-  const { kandidats } = useSelector((state: RootState) => state.CreatePemiluSlice)
+  const { bilikSuara } = useSelector((state: RootState) => state.CreatePemiluSlice)
 
   const form = useForm<PemiluFormType>({
     validateInputOnChange: true,
     initialValues: {
-      name: kandidats[number - 1]?.name || '',
-      image: kandidats[number - 1]?.image || '',
-      color: kandidats[number - 1]?.color || '',
+      prepare: bilikSuara[number - 1]?.prepare || 0,
+      timer: bilikSuara[number - 1]?.timer || 0,
     },
     validate: {
-      name: value => {
-        if (!/^[a-zA-Z0-9 ]{3,30}$/.test(value)) {
-          return 'Nama hanya diisi dengan huruf 3-30 karakter.'
+      prepare: isNotEmpty('Prepare tidak boleh kosong.'),
+      timer: value => {
+        if (value < 10) {
+          return 'Batas waktu tidak boleh kurang dari 10 detik.'
         }
         return null
       },
-      image: isNotEmpty('Foto tidak boleh kosong.'),
-      color: isNotEmpty('Warna tidak boleh kosong.'),
     },
   })
 
   React.useEffect(() => {
     if (form.isValid()) {
       dispatch(
-        setOrUpdateKandidats({ isValid: true, ...form.values, id: number.toString() })
+        setOrUpdateBilikSuara({ isValid: true, ...form.values, id: number.toString() })
       )
     } else {
       dispatch(
-        setOrUpdateKandidats({ isValid: false, ...form.values, id: number.toString() })
+        setOrUpdateBilikSuara({ isValid: false, ...form.values, id: number.toString() })
       )
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -68,7 +63,7 @@ export default function CardFormKandidat({ number, handleDeleteButton }: Props) 
             className="px-4 py-3 bg-two w-full"
             onClick={() => setIsExpanded(!isExpanded)}>
             <div className="flex justify-between items-center">
-              <h1 className="font-semibold text-[15px] text-one">Kandidat {number}</h1>
+              <h1 className="font-semibold text-[15px] text-one">Bilik {number}</h1>
               <IoIosArrowDown
                 className={`text-one transition-transform ${
                   isExpanded ? 'rotate-180' : ''
@@ -85,26 +80,22 @@ export default function CardFormKandidat({ number, handleDeleteButton }: Props) 
                 overlayColor="#a0a0a0"
               />
               <Input
-                label="Nama"
-                id="name"
-                type="text"
-                value={form.values.name}
-                errorLabel={form.errors.name as string}
-                onChange={e => form.setFieldValue('name', e as string)}
+                label="Prepare"
+                id="prepare"
+                type="number"
+                min={0}
+                value={form.values.prepare}
+                errorLabel={form.errors.prepare as string}
+                onChange={e => form.setFieldValue('prepare', e as unknown as number)}
               />
-              <InputImage
-                label="Foto"
-                id="image"
-                value={form.values.image}
-                errorLabel={form.errors.image as string}
-                onChange={e => form.setFieldValue('image', e as string)}
-              />
-              <InputColor
-                label="Warna"
-                id="color"
-                value={form.values.color}
-                errorLabel={form.errors.color as string}
-                onChange={e => form.setFieldValue('color', e as string)}
+              <Input
+                label="Batas Waktu"
+                id="timer"
+                type="number"
+                min={0}
+                value={form.values.timer}
+                errorLabel={form.errors.timer as string}
+                onChange={e => form.setFieldValue('timer', e as unknown as number)}
               />
               {handleDeleteButton ? (
                 <div
@@ -112,7 +103,7 @@ export default function CardFormKandidat({ number, handleDeleteButton }: Props) 
                   className="rounded-[10px] bg-white border border-danger/50 border-dashed p-[10px] flex items-center justify-center gap-4 hover:shadow-md transition-all duration-300 cursor-pointer text-danger relative hover:z-[500] hover:bg-danger hover:text-white mt-5"
                   onClick={() => {
                     handleDeleteButton()
-                    dispatch(deleteKandidats(number.toString()))
+                    dispatch(deleteBilikSuara(number.toString()))
                   }}>
                   <PiTrashBold size={20} />
                 </div>

@@ -23,7 +23,7 @@ const InputImage: React.FC<InputProps> = ({
   onChange,
 }) => {
   const [error, setError] = React.useState('')
-  const [blob, setBlob] = React.useState<string>()
+  const [blob, setBlob] = React.useState<string>(value)
 
   const handleDrop = (e: FileWithPath[]) => {
     const file = e[0]

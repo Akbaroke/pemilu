@@ -25,7 +25,7 @@ export default function KandidatForm() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="pb-2 border-b ">
+      <div className="py-4 border-b sticky top-14 bg-white z-30">
         <h1 className="text-one font-bold text-[20px]">Daftar Kandidat</h1>
       </div>
       {formKandidatComponents}
