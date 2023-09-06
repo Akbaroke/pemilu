@@ -27,6 +27,7 @@ export default function CardFormBilikSuara({ number, handleDeleteButton }: Props
 
   const form = useForm<PemiluFormType>({
     validateInputOnChange: true,
+    validateInputOnBlur: true,
     initialValues: {
       prepare: bilikSuara[number - 1]?.prepare || 0,
       timer: bilikSuara[number - 1]?.timer || 0,

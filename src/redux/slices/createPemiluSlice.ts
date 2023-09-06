@@ -1,19 +1,26 @@
+import { FileWithPath } from '@mantine/dropzone'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 interface FormDetailState {
   name: string
   maxQueue: number
-  started_at: Date
-  ended_at: Date
+  started_at: number
+  ended_at: number
   isValid: boolean
 }
 interface FormKandidatState {
   id: string
   name: string
-  image: string
+  image: Image
   color: string
   isValid: boolean
 }
+
+type Image = {
+  url: string
+  file: FileWithPath
+}
+
 interface FormBilikSuaraState {
   id: string
   prepare: number
@@ -33,7 +40,7 @@ const initialState: initialTypeCreatePemilu = {
   bilikSuara: [],
 }
 
-const CreatePemiluSlice = createSlice({
+const CreatePemiluSlice: any = createSlice({
   name: 'formKandidat',
   initialState,
   reducers: {
@@ -48,9 +55,6 @@ const CreatePemiluSlice = createSlice({
     deleteKandidats: (state, action: PayloadAction<string>) => {
       state.kandidats = state.kandidats.filter(data => data.id !== action.payload)
     },
-    unsetKandidats: state => {
-      state.kandidats = []
-    },
 
     setOrUpdateBilikSuara: (state, action: PayloadAction<FormBilikSuaraState>) => {
       const index = state.bilikSuara.findIndex(data => data.id === action.payload.id)
@@ -63,9 +67,6 @@ const CreatePemiluSlice = createSlice({
     deleteBilikSuara: (state, action: PayloadAction<string>) => {
       state.bilikSuara = state.bilikSuara.filter(data => data.id !== action.payload)
     },
-    unsetBilikSuara: state => {
-      state.bilikSuara = []
-    },
 
     setDetail: (state, action: PayloadAction<FormDetailState>) => {
       state.detail = {
@@ -76,8 +77,11 @@ const CreatePemiluSlice = createSlice({
         isValid: action.payload.isValid,
       }
     },
-    unsetDetail: state => {
+
+    resetFormState: state => {
       state.detail = null
+      state.kandidats = []
+      state.bilikSuara = []
     },
   },
 })
@@ -85,11 +89,9 @@ const CreatePemiluSlice = createSlice({
 export const {
   setOrUpdateKandidats,
   deleteKandidats,
-  unsetKandidats,
   setOrUpdateBilikSuara,
   deleteBilikSuara,
-  unsetBilikSuara,
   setDetail,
-  unsetDetail,
+  resetFormState,
 } = CreatePemiluSlice.actions
 export default CreatePemiluSlice.reducer

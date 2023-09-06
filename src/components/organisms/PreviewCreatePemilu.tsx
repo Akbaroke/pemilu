@@ -28,7 +28,7 @@ export default function PreviewCreatePemilu() {
             {kandidats?.map(value => (
               <div key={value.id} className="flex items-center gap-4">
                 <Image
-                  src={value.image}
+                  src={value.image.url}
                   alt={value.name}
                   width={71}
                   height={71}

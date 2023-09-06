@@ -25,18 +25,18 @@ const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         const { email, password } = credentials as {
-          email: string;
-          password: string;
-        };
-        const user: any = await signIn({ email });
+          email: string
+          password: string
+        }
+        const user: any = await signIn({ email })
         if (user) {
-          const passwordConfirm = await compare(password, user.password);
+          const passwordConfirm = await compare(password, user.password)
           if (passwordConfirm) {
-            return user;
+            return user
           }
-          return null;
+          return null
         } else {
-          return null;
+          return null
         }
       },
     }),
@@ -48,37 +48,41 @@ const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, account, profile, user }: any) {
       if (account?.provider === 'credentials' && account?.email) {
-        token.name = account.name;
-        token.email = account.email;
+        token.name = account.name
+        token.email = account.email
       }
       if (account?.provider === 'google' && user?.email) {
         const data = {
           name: user.name,
           email: user.email,
           type: 'google',
-        };
+        }
 
-        await signInWithGoogle(data, (result: { status: boolean; message: string; data: any }) => {
-          if (result.status) {
-            token.name = result.data.name;
-            token.email = result.data.email;
-            token.type = result.data.type;
+        await signInWithGoogle(
+          data,
+          (result: { status: boolean; message: string; data: any }) => {
+            if (result.status) {
+              token.name = result.data.name
+              token.email = result.data.email
+              token.type = result.data.type
+            }
           }
-        });
+        )
       }
-      return token;
+      return token
     },
 
     async session({ session, token }: any) {
       if (token?.name) {
-        session.user.name = token.name;
+        session.user.name = token.name
       }
       if (token?.email) {
-        session.user.email = token.email;
+        session.user.email = token.email
       }
-      return session;
+
+      return session
     },
   },
-};
+}
 
 export default NextAuth(authOptions);

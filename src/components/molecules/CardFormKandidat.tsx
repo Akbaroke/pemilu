@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { deleteKandidats, setOrUpdateKandidats } from '@/redux/slices/createPemiluSlice'
 import { useHover } from '@mantine/hooks'
 import { RootState } from '@/redux/store'
+import { FileWithPath } from '@mantine/dropzone'
 
 type PemiluFormType = {
   name: string
@@ -25,14 +26,16 @@ type Props = {
 export default function CardFormKandidat({ number, handleDeleteButton }: Props) {
   const dispatch = useDispatch()
   const [isExpanded, setIsExpanded] = React.useState(false)
+  const [imageFile, setImageFile] = React.useState<FileWithPath>()
   const { hovered, ref } = useHover()
   const { kandidats } = useSelector((state: RootState) => state.CreatePemiluSlice)
 
   const form = useForm<PemiluFormType>({
     validateInputOnChange: true,
+    validateInputOnBlur: true,
     initialValues: {
       name: kandidats[number - 1]?.name || '',
-      image: kandidats[number - 1]?.image || '',
+      image: kandidats[number - 1]?.image.url || '',
       color: kandidats[number - 1]?.color || '',
     },
     validate: {
@@ -48,14 +51,32 @@ export default function CardFormKandidat({ number, handleDeleteButton }: Props) 
   })
 
   React.useEffect(() => {
-    if (form.isValid()) {
-      dispatch(
-        setOrUpdateKandidats({ isValid: true, ...form.values, id: number.toString() })
-      )
-    } else {
-      dispatch(
-        setOrUpdateKandidats({ isValid: false, ...form.values, id: number.toString() })
-      )
+    if (imageFile) {
+      if (form.isValid()) {
+        dispatch(
+          setOrUpdateKandidats({
+            ...form.values,
+            isValid: true,
+            id: number.toString(),
+            image: {
+              url: form.values.image,
+              file: imageFile,
+            },
+          })
+        )
+      } else {
+        dispatch(
+          setOrUpdateKandidats({
+            ...form.values,
+            isValid: false,
+            id: number.toString(),
+            image: {
+              url: form.values.image,
+              file: imageFile,
+            },
+          })
+        )
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.values])
@@ -97,7 +118,10 @@ export default function CardFormKandidat({ number, handleDeleteButton }: Props) 
                 id="image"
                 value={form.values.image}
                 errorLabel={form.errors.image as string}
-                onChange={e => form.setFieldValue('image', e as string)}
+                onChange={e => {
+                  form.setFieldValue('image', URL.createObjectURL(e as FileWithPath))
+                  setImageFile(e as FileWithPath)
+                }}
               />
               <InputColor
                 label="Warna"

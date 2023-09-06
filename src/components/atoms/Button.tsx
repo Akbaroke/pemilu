@@ -28,7 +28,14 @@ const Button: React.FC<ButtonProps> = ({
         'rounded-[10px] shadow-md min-w-[100px] h-[45px] font-bold text-[15px] active:scale-95 active:shadow-none transition-all px-6 capitalize bg-success text-white',
         className,
         {
-          'grid place-items-center opacity-70': isLoading,
+          'grid place-items-center opacity-70 shadow-none active:scale-100':
+            isLoading || isDisabled,
+        },
+        {
+          'cursor-not-allowed': isDisabled,
+        },
+        {
+          'cursor-wait': isLoading,
         }
       )}
       onClick={onClick}>

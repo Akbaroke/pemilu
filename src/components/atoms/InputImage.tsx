@@ -11,7 +11,7 @@ interface InputProps {
   errorLabel?: string
   readOnly?: boolean
   isLoading?: boolean
-  onChange: (e: React.ChangeEvent<HTMLInputElement> | string) => void
+  onChange: (e: FileWithPath | string) => void
 }
 
 const InputImage: React.FC<InputProps> = ({
@@ -27,13 +27,14 @@ const InputImage: React.FC<InputProps> = ({
 
   const handleDrop = (e: FileWithPath[]) => {
     const file = e[0]
+
     if (file.size > 1000000) {
       setError('File tidak boleh melebihi 1MB')
       onChange('')
       setBlob('')
     } else {
       setBlob(URL.createObjectURL(file))
-      onChange(URL.createObjectURL(file))
+      onChange(file)
       setError('')
     }
   }

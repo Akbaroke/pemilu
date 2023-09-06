@@ -5,13 +5,13 @@ import { DateTimePicker, DateValue } from '@mantine/dates'
 interface InputProps {
   label: string
   id: string
-  value: Date
+  value: DateValue
   errorLabel?: string
   disabled?: boolean
   readOnly?: boolean
   isLoading?: boolean
   minDate?: Date
-  onChange: (e: DateValue | Date) => void
+  onChange: (e: DateValue) => void
 }
 
 const InputDateTime: React.FC<InputProps> = ({
@@ -32,7 +32,11 @@ const InputDateTime: React.FC<InputProps> = ({
       <DateTimePicker
         variant="unstyled"
         id={id}
-        value={value as Date}
+        value={
+          value?.getTime() == new Date('1970-01-01T00:00:00.000Z')?.getTime()
+            ? new Date(new Date().getTime())
+            : value
+        }
         minDate={minDate}
         onChange={(value: DateValue) => onChange(value)}
         disabled={isLoading || disabled}

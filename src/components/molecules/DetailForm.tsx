@@ -13,17 +13,18 @@ type DetailFormType = {
   ended_at: Date
 }
 
-export default function DetailForm() {
+export default function DetailForm({ DetailValues }: { DetailValues?: DetailFormType }) {
   const dispatch = useDispatch()
   const { detail } = useSelector((state: RootState) => state.CreatePemiluSlice)
 
   const form = useForm<DetailFormType>({
     validateInputOnChange: true,
+    validateInputOnBlur: true,
     initialValues: {
-      name: detail?.name || '',
-      maxQueue: detail?.maxQueue || 0,
-      started_at: detail?.started_at || new Date(),
-      ended_at: detail?.ended_at || new Date(),
+      name: DetailValues?.name || detail?.name || '',
+      maxQueue: DetailValues?.maxQueue || detail?.maxQueue || 0,
+      started_at: new Date(DetailValues?.started_at || detail?.started_at || 0),
+      ended_at: new Date(DetailValues?.ended_at || detail?.ended_at || 0),
     },
     validate: {
       name: value => {
@@ -57,13 +58,38 @@ export default function DetailForm() {
 
   React.useEffect(() => {
     if (form.isValid()) {
-      dispatch(setDetail({ isValid: true, ...form.values }))
+      dispatch(
+        setDetail({
+          isValid: true,
+          ...form.values,
+          started_at: new Date(form.values.started_at).getTime(),
+          ended_at: new Date(form.values.ended_at).getTime(),
+        })
+      )
     } else {
-      dispatch(setDetail({ isValid: false, ...form.values }))
+      dispatch(
+        setDetail({
+          isValid: false,
+          ...form.values,
+          started_at: new Date(form.values.started_at).getTime(),
+          ended_at: new Date(form.values.ended_at).getTime(),
+        })
+      )
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.values])
+
+  React.useEffect(() => {
+    if (detail) {
+      form.setValues({
+        ...detail,
+        started_at: new Date(detail.started_at),
+        ended_at: new Date(detail.ended_at),
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <div className="flex flex-col gap-4">

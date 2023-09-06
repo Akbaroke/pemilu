@@ -3,18 +3,29 @@ import Button from '@/components/atoms/Button'
 import Layout from '@/components/templates/Layout'
 import KandidatForm from '@/components/organisms/KandidatForm'
 import StepperCreatePemilu from '@/components/molecules/StepperCreatePemilu'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '@/redux/store'
 import cn from '@/utils/cn'
 import BilikSuaraForm from '@/components/organisms/BilikSuaraForm'
 import PreviewCreatePemilu from '@/components/organisms/PreviewCreatePemilu'
 import DetailForm from '@/components/molecules/DetailForm'
 import { Checkbox } from '@mantine/core'
+import { useSession } from 'next-auth/react'
+import generateSlug from '@/utils/generateSlug'
+import { OptionType, RoomType } from '@/types/pemilu'
+import { useRouter } from 'next/router'
+import { addDoc, collection } from 'firebase/firestore'
+import { firestore, storage } from '@/lib/firebase/init'
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage'
+import { resetFormState } from '@/redux/slices/createPemiluSlice'
 
 export default function CretePemilu() {
-  const [isChecked, setIsChecked] = React.useState(false)
-  const [active, setActive] = React.useState(0)
-  const [isKandidatsValid, setIsKandidatsValid] = React.useState(false)
+  const dispatch = useDispatch()
+  const { data } = useSession()
+  const { push } = useRouter()
+  const [isChecked, setIsChecked] = React.useState<boolean>(false)
+  const [active, setActive] = React.useState<number>(0)
+  const [isKandidatsValid, setIsKandidatsValid] = React.useState<boolean>(false)
   const { detail, kandidats, bilikSuara } = useSelector(
     (state: RootState) => state.CreatePemiluSlice
   )
@@ -22,23 +33,26 @@ export default function CretePemilu() {
   React.useEffect(() => {
     const checkKandidats = () => {
       let isValid = false
+
       if (active === 0) {
-        detail?.isValid ? (isValid = true) : (isValid = false)
+        isValid = !!detail?.isValid
       } else if (active === 1) {
-        kandidats.map(kandidat => {
-          kandidat.isValid ? (isValid = true) : (isValid = false)
-        })
+        isValid = kandidats.every(kandidat => !!kandidat.isValid)
       } else if (active === 2) {
-        bilikSuara.map(bilikSuara => {
-          bilikSuara.isValid ? (isValid = true) : (isValid = false)
-        })
+        isValid = bilikSuara.every(bilik => !!bilik.isValid)
       } else {
-        isChecked ? (isValid = true) : (isValid = false)
+        isValid = isChecked
       }
+
       setIsKandidatsValid(isValid)
     }
     checkKandidats()
   }, [detail, kandidats, bilikSuara, active, isChecked])
+
+  React.useEffect(() => {
+    return () => dispatch(resetFormState())
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const ContentFrom = () => {
     switch (active) {
@@ -53,9 +67,80 @@ export default function CretePemilu() {
     }
   }
 
+  const handleCreatePemilu = async () => {
+    console.log('klik')
+
+    if (data?.user?.email && detail && kandidats && bilikSuara) {
+      const slug = generateSlug()
+      const uploadPromises: any[] = []
+      const imageUrls: string[] = []
+
+      kandidats.forEach(kandidat => {
+        const storageRef = ref(storage, `kandidat/${slug}/${kandidat.id}.jpg`)
+
+        const uploadPromise = uploadBytes(storageRef, kandidat.image.file)
+          .then(snapshot => {
+            return getDownloadURL(storageRef)
+          })
+          .then(downloadURL => {
+            console.log(`File ${kandidat.id}.jpg berhasil diupload!`)
+            imageUrls.push(downloadURL)
+          })
+          .catch(error => {
+            console.error(`Error mengupload file ${kandidat.id}.jpg: `, error)
+          })
+
+        uploadPromises.push(uploadPromise)
+      })
+
+      try {
+        await Promise.all(uploadPromises)
+
+        const options: OptionType[] = kandidats.map((kandidat, index) => ({
+          id: kandidat.id,
+          name: kandidat.name,
+          imageUrl: imageUrls[index],
+          color: kandidat.color,
+        }))
+
+        const rooms: RoomType[] = bilikSuara.map(bilik => ({
+          id: bilik.id,
+          prepare: bilik.prepare,
+          timer: bilik.timer,
+        }))
+
+        const dataPemilu = {
+          emailUserCreated: data.user.email,
+          slug: slug,
+          name: detail.name,
+          maxQueue: detail.maxQueue,
+          started_at: detail.started_at,
+          ended_at: detail.ended_at,
+          options: options,
+          rooms: rooms,
+        }
+
+        await addDoc(collection(firestore, 'pemilu'), dataPemilu)
+
+        console.log({
+          status: true,
+          message: 'Berhasil membuat pemilu',
+        })
+
+        push('/')
+        dispatch(resetFormState())
+      } catch (error) {
+        console.log({
+          status: false,
+          message: error,
+        })
+      }
+    }
+  }
+
   return (
     <Layout isBackBtn title="Buat Pemilu">
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-5">
         <StepperCreatePemilu active={active} setActive={setActive} />
         {ContentFrom()}
         <div
@@ -72,11 +157,9 @@ export default function CretePemilu() {
             />
           ) : null}
           <Button
-            className={cn('mt-5', {
-              'opacity-70 shadow-none active:scale-100': !isKandidatsValid,
-            })}
+            className="mt-5"
             isDisabled={!isKandidatsValid}
-            onClick={() => setActive(active + 1)}>
+            onClick={() => (active === 3 ? handleCreatePemilu() : setActive(active + 1))}>
             {active === 3 ? 'Selesai' : 'Selanjutnya'}
           </Button>
         </div>
