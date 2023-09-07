@@ -17,6 +17,7 @@ export default function Setting({ pemiluDatas }: { pemiluDatas: PemiluDatas }) {
   const dispatch = useDispatch()
   const { slug } = router.query
   const { detail } = useSelector((state: RootState) => state.CreatePemiluSlice)
+  const [isLoading, setIsLoading] = React.useState(false)
 
   React.useEffect(() => {
     return () => dispatch(resetFormState())
@@ -25,6 +26,7 @@ export default function Setting({ pemiluDatas }: { pemiluDatas: PemiluDatas }) {
 
   const handleUpdateDetail = async () => {
     try {
+      setIsLoading(true)
       const q = query(collection(firestore, 'pemilu'), where('slug', '==', slug))
       const docSnap = await getDocs(q)
       const id = docSnap.docs[0].id
@@ -40,15 +42,17 @@ export default function Setting({ pemiluDatas }: { pemiluDatas: PemiluDatas }) {
 
       console.log({
         status: true,
-        message: 'Berhasil membuat pemilu',
+        message: 'Berhasil update pengaturan pemilu',
       })
 
       router.back()
     } catch (error) {
       console.log({
         status: false,
-        message: error,
+        message: 'Gagal update pengaturan pemilu',
       })
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -63,7 +67,10 @@ export default function Setting({ pemiluDatas }: { pemiluDatas: PemiluDatas }) {
         }}
       />
       <div className="mt-10 flex justify-center">
-        <Button isDisabled={!detail?.isValid} onClick={handleUpdateDetail}>
+        <Button
+          isDisabled={!detail?.isValid}
+          onClick={handleUpdateDetail}
+          isLoading={isLoading}>
           Simpan
         </Button>
       </div>

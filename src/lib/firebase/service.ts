@@ -12,7 +12,6 @@ import {
 import app from './init'
 import bcrypt from 'bcrypt'
 import { UserData } from '@/interfaces/auth'
-import { PemiluDatas } from '@/interfaces/pemilu'
 
 const firestore = getFirestore(app)
 
