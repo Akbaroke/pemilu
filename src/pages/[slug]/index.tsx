@@ -4,7 +4,7 @@ import { Chart } from 'primereact/chart'
 import Image from 'next/image'
 import CopyBtn from '@/components/atoms/CopyBtn'
 import Layout from '@/components/templates/Layout'
-import { Badge } from '@mantine/core'
+import { Badge, Loader } from '@mantine/core'
 import { BiTimer } from 'react-icons/bi'
 import { VscDebugDisconnect } from 'react-icons/vsc'
 import { IoMdSettings } from 'react-icons/io'
@@ -16,6 +16,7 @@ import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import fetchPemiluData from '@/utils/fetchPemiluData'
 import getPageUrl from '@/utils/getPageUrl'
+import cn from '@/utils/cn'
 
 export default function Index({ pemiluDatas }: { pemiluDatas: PemiluDatas }) {
   const router = useRouter()
@@ -114,19 +115,34 @@ export default function Index({ pemiluDatas }: { pemiluDatas: PemiluDatas }) {
               <Badge color="green" className="w-max">
                 Bilik {value.id}
               </Badge>
-              <div className="flex justify-between items-center mt-3">
+              <div
+                className={cn('mt-3', {
+                  'flex justify-between items-center': !!value.userActive,
+                })}>
                 <div className="flex flex-col justify-between gap-2">
-                  <h1 className="font-medium text-[14px] text-one">
-                    {value.userActive?.name || 'Kosong...'}
-                  </h1>
+                  {value.userActive ? (
+                    <h1 className="font-medium text-[14px] text-one">
+                      {value.userActive?.name}
+                    </h1>
+                  ) : (
+                    <div className="flex items-center justify-center mb-4 mt-1">
+                      <Loader style={{ fill: '#000' }} variant="dots" size="sm" />
+                    </div>
+                  )}
                   <div className="text-three font-normal text-[12px] flex items-center gap-1">
                     <BiTimer size={18} />
-                    <p>Sisa waktu 1 menit 3 detik</p>
+                    <p>
+                      {value.userActive
+                        ? 'Sisa waktu 1 menit 3 detik'
+                        : `Batas waktu habis ${value.timer} s`}
+                    </p>
                   </div>
                 </div>
-                <div className="bg-[#CA3030]/25 w-[35px] h-[35px] rounded-[5px] grid place-items-center cursor-pointer shadow-md transition-all hover:shadow-sm">
-                  <VscDebugDisconnect size={20} color="#CA3030" />
-                </div>
+                {value.userActive ? (
+                  <div className="bg-[#CA3030]/25 w-[35px] h-[35px] rounded-[5px] grid place-items-center cursor-pointer shadow-md transition-all hover:shadow-sm">
+                    <VscDebugDisconnect size={20} color="#CA3030" />
+                  </div>
+                ) : null}
               </div>
             </div>
           ))}
