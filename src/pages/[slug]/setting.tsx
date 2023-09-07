@@ -9,14 +9,26 @@ import { PemiluDatas } from '@/interfaces/pemilu'
 import Button from '@/components/atoms/Button'
 import { RootState } from '@/redux/store'
 import { resetFormState } from '@/redux/slices/createPemiluSlice'
-import { collection, doc, getDocs, query, setDoc, where } from 'firebase/firestore'
-import { firestore } from '@/lib/firebase/init'
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  query,
+  setDoc,
+  where,
+} from 'firebase/firestore'
+import { firestore, storage } from '@/lib/firebase/init'
+import ButtonWithModal from '@/components/molecules/ButtonWithModal'
+import TRASH_STORYSET from '@/assets/storysets/trash.png'
+import { deleteObject, listAll, ref } from 'firebase/storage'
 
 export default function Setting({ pemiluDatas }: { pemiluDatas: PemiluDatas }) {
   const router = useRouter()
   const dispatch = useDispatch()
   const { slug } = router.query
   const { detail } = useSelector((state: RootState) => state.CreatePemiluSlice)
+  const [isLoading, setIsLoading] = React.useState(false)
 
   React.useEffect(() => {
     return () => dispatch(resetFormState())
@@ -25,6 +37,7 @@ export default function Setting({ pemiluDatas }: { pemiluDatas: PemiluDatas }) {
 
   const handleUpdateDetail = async () => {
     try {
+      setIsLoading(true)
       const q = query(collection(firestore, 'pemilu'), where('slug', '==', slug))
       const docSnap = await getDocs(q)
       const id = docSnap.docs[0].id
@@ -40,15 +53,52 @@ export default function Setting({ pemiluDatas }: { pemiluDatas: PemiluDatas }) {
 
       console.log({
         status: true,
-        message: 'Berhasil membuat pemilu',
+        message: 'Berhasil update pengaturan pemilu',
       })
 
       router.back()
     } catch (error) {
       console.log({
         status: false,
-        message: error,
+        message: 'Gagal update pengaturan pemilu',
+        error: error,
       })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleButtonDelete = async () => {
+    try {
+      setIsLoading(true)
+
+      const q = query(collection(firestore, 'pemilu'), where('slug', '==', slug))
+      const docSnap = await getDocs(q)
+      const id = docSnap.docs[0].id
+
+      const pemiluRef = doc(firestore, 'pemilu', id)
+      await deleteDoc(pemiluRef)
+
+      const storageRef = ref(storage, `kandidat/${slug}`)
+      const list = await listAll(storageRef)
+      list.items.map(data => {
+        deleteObject(ref(storage, `kandidat/${slug}/${data.name}`))
+      })
+
+      console.log({
+        status: true,
+        message: 'Berhasil hapus pemilu',
+      })
+
+      router.push('/')
+    } catch (error) {
+      console.log({
+        status: false,
+        message: 'Gagal hapus pemilu',
+        error: error,
+      })
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -62,8 +112,20 @@ export default function Setting({ pemiluDatas }: { pemiluDatas: PemiluDatas }) {
           ended_at: pemiluDatas.ended_at,
         }}
       />
-      <div className="mt-10 flex justify-center">
-        <Button isDisabled={!detail?.isValid} onClick={handleUpdateDetail}>
+      <div className="mt-10 flex justify-center gap-5">
+        <ButtonWithModal
+          message="Semua data akan dihapus secara permanen."
+          imgIcon={TRASH_STORYSET}
+          actionTrue={handleButtonDelete}
+          className="bg-danger"
+          title="Yakin mau menghapus ?"
+          isLoading={isLoading}>
+          Hapus
+        </ButtonWithModal>
+        <Button
+          isDisabled={!detail?.isValid}
+          onClick={handleUpdateDetail}
+          isLoading={isLoading}>
           Simpan
         </Button>
       </div>

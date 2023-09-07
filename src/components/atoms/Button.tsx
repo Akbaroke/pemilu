@@ -5,7 +5,6 @@ import cn from '@/utils/cn'
 interface ButtonProps {
   type?: 'submit' | 'button'
   className?: string
-  color?: string
   children: React.ReactNode
   isLoading?: boolean
   isDisabled?: boolean

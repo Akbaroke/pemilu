@@ -1,34 +1,7 @@
-import { FileWithPath } from '@mantine/dropzone'
+import { FormBilikSuaraState, FormDetailState, FormKandidatState } from '@/types/pemilu'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-interface FormDetailState {
-  name: string
-  maxQueue: number
-  started_at: number
-  ended_at: number
-  isValid: boolean
-}
-interface FormKandidatState {
-  id: string
-  name: string
-  image: Image
-  color: string
-  isValid: boolean
-}
-
-type Image = {
-  url: string
-  file: FileWithPath
-}
-
-interface FormBilikSuaraState {
-  id: string
-  prepare: number
-  timer: number
-  isValid: boolean
-}
-
-export type initialTypeCreatePemilu = {
+export interface initialTypeCreatePemilu {
   detail: FormDetailState | null
   kandidats: FormKandidatState[]
   bilikSuara: FormBilikSuaraState[]
