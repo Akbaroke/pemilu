@@ -25,6 +25,22 @@ export async function getMyPemilu(email: string) {
 
   return data
 }
+export async function getPemiluBySearch(key: string) {
+  const snapshot = await getDocs(collection(firestore, 'pemilu'))
+  const data = snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+  }))
+
+  // Filter data berdasarkan kata kunci
+  const filteredData = data.filter((item: any) => {
+    const searchData = `${item.name} ${item.slug}`.toLowerCase()
+    return searchData.includes(key.toLowerCase())
+  })
+
+  return filteredData
+}
+
 export async function getPemiluBySlug(slug: string) {
   const q = query(collection(firestore, 'pemilu'), where('slug', '==', slug))
   const snapshot = await getDocs(q)

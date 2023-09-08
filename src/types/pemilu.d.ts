@@ -19,7 +19,7 @@ export type RoomType = {
 }
 
 export type QueueType = {
-  id: string
+  email: string
   name: string
 }
 
