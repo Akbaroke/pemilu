@@ -99,8 +99,8 @@ export default function Setting({ pemiluDatas }: { pemiluDatas: PemiluDatas }) {
         DetailValues={{
           name: pemiluDatas.name,
           maxVoters: pemiluDatas.maxVoters,
-          started_at: pemiluDatas.started_at,
-          ended_at: pemiluDatas.ended_at,
+          started_at: new Date(pemiluDatas.started_at),
+          ended_at: new Date(pemiluDatas.ended_at),
         }}
       />
       <div className="mt-10 flex justify-center gap-5">
