@@ -1,8 +1,8 @@
-import { signIn, signInWithGoogle } from '@/lib/firebase/service';
-import { compare } from 'bcrypt';
-import NextAuth, { NextAuthOptions } from 'next-auth';
-import GoogleProvider from 'next-auth/providers/google';
-import CredentialsProvider from 'next-auth/providers/credentials';
+import crypto from 'crypto'
+import { signIn, signInWithGoogle } from '@/lib/firebase/service'
+import NextAuth, { NextAuthOptions } from 'next-auth'
+import GoogleProvider from 'next-auth/providers/google'
+import CredentialsProvider from 'next-auth/providers/credentials'
 
 const authOptions: NextAuthOptions = {
   session: {
@@ -30,7 +30,11 @@ const authOptions: NextAuthOptions = {
         }
         const user: any = await signIn({ email })
         if (user) {
-          const passwordConfirm = await compare(password, user.password)
+          const passwordConfirm = comparePasswords(
+            password,
+            user.password,
+            process.env.NEXT_PUBLIC_SALT as string
+          )
           if (passwordConfirm) {
             return user
           }
@@ -85,4 +89,12 @@ const authOptions: NextAuthOptions = {
   },
 }
 
-export default NextAuth(authOptions);
+export default NextAuth(authOptions)
+
+function comparePasswords(inputPassword: string, hashedPassword: string, salt: string) {
+  const inputHashedPassword = crypto
+    .createHmac('sha256', salt)
+    .update(inputPassword)
+    .digest('hex')
+  return inputHashedPassword === hashedPassword
+}

@@ -1,4 +1,4 @@
-import { FormBilikSuaraState, FormDetailState, FormKandidatState } from '@/types/pemilu'
+import { FormDetailState, FormKandidatState } from '@/types/pemilu'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 export interface initialTypeCreatePemilu {

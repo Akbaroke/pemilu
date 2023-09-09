@@ -9,10 +9,11 @@ import { AxiosErrorResponse } from '@/interfaces/axios'
 import { signIn } from 'next-auth/react'
 import GoogleAuthButton from '@/components/atoms/GoogleAuthButton'
 import Link from 'next/link';
+import { notifyError, notifyLoading, notifySuccess } from '@/components/molecules/Toast'
 
 export default function Login() {
-  const [isLoading, setIsLoading] = React.useState(false);
-  const { query, push } = useRouter();
+  const [isLoading, setIsLoading] = React.useState(false)
+  const { query, push } = useRouter()
 
   const form = useForm<LoginFormType>({
     initialValues: {
@@ -21,48 +22,67 @@ export default function Login() {
     },
     validate: {
       email: isEmail('Email tidak valid.'),
-      password: (value) => {
+      password: value => {
         if (value.length < 8) {
-          return 'Password minimal 8 karakter.';
+          return 'Password minimal 8 karakter.'
         }
-        return null;
+        return null
       },
     },
-  });
+  })
 
-  const callbackUrl: any = query.callbackUrl || '/';
+  const callbackUrl: any = query.callbackUrl || '/'
 
   const handleSubmit = async (value: LoginFormType) => {
-    setIsLoading(true);
+    notifyLoading('Masuk diproses...', 'login')
+    setIsLoading(true)
     try {
       const res = await signIn('credentials', {
         redirect: false,
         email: value.email,
         password: value.password,
         callbackUrl,
-      });
+      })
       if (!res?.error) {
-        setIsLoading(false);
-        push(callbackUrl);
+        notifySuccess('Berhasil masuk', 'login')
+        setIsLoading(false)
+        push(callbackUrl)
       } else {
-        setIsLoading(false);
-        console.log(res.error);
+        notifyError('Gagal masuk, periksa kembali email atau password', 'login')
+        setIsLoading(false)
       }
     } catch (error) {
-      const axiosError = error as AxiosErrorResponse;
-      console.log(axiosError);
+      const axiosError = error as AxiosErrorResponse
+      notifyError('Gagal masuk', 'login')
+      console.log(axiosError)
     }
-    setIsLoading(false);
-  };
+    setIsLoading(false)
+  }
 
   return (
     <Layout>
       <h1 className="font-bold text-[20px] text-one">Masuk</h1>
-      <form onSubmit={form.onSubmit(handleSubmit)} className="flex flex-col items-center mt-[30px]">
+      <form
+        onSubmit={form.onSubmit(handleSubmit)}
+        className="flex flex-col items-center mt-[30px]">
         <GoogleAuthButton title="Masuk dengan google" />
         <div className="flex flex-col my-5 w-full">
-          <Input label="Email" id="email" type="email" value={form.values.email} errorLabel={form.errors.email as string} onChange={(e) => form.setFieldValue('email', e as string)} />
-          <Input label="Password" id="password" type="password" value={form.values.password} errorLabel={form.errors.password as string} onChange={(e) => form.setFieldValue('password', e as string)} />
+          <Input
+            label="Email"
+            id="email"
+            type="email"
+            value={form.values.email}
+            errorLabel={form.errors.email as string}
+            onChange={e => form.setFieldValue('email', e as string)}
+          />
+          <Input
+            label="Password"
+            id="password"
+            type="password"
+            value={form.values.password}
+            errorLabel={form.errors.password as string}
+            onChange={e => form.setFieldValue('password', e as string)}
+          />
         </div>
         <Button type="submit" isLoading={isLoading} className="text-white mt-4">
           Masuk
@@ -75,5 +95,5 @@ export default function Login() {
         </Link>
       </div>
     </Layout>
-  );
+  )
 }
