@@ -3,24 +3,13 @@ export type OptionType = {
   name: string
   imageUrl: string
   color: string
-  votes?: VoteType[]
+  voters?: VotersType[]
 }
 
-export type VoteType = {
-  id: string
+export type VotersType = {
+  email: string
   name: string
-}
-
-export type RoomType = {
-  id: string
-  prepare: number
-  timer: number
-  userActive?: UserActiveType
-}
-
-export type QueueType = {
-  id: string
-  name: string
+  time: number
 }
 
 export type UserActiveType = {
@@ -31,7 +20,9 @@ export type UserActiveType = {
 
 export type FormDetailState = {
   name: string
-  maxQueue: number
+  maxVoters: number
+  prepareTime: number
+  limitTime: number
   started_at: number
   ended_at: number
   isValid?: boolean

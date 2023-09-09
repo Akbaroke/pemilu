@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { Stepper, StepperProps, rem } from '@mantine/core'
 import { FaUserTie } from 'react-icons/fa'
-import { MdRoomPreferences } from 'react-icons/md'
 import { PiNotepadBold } from 'react-icons/pi'
+import { HiEye } from 'react-icons/hi'
 
 type Props = {
   active: number
@@ -19,7 +19,7 @@ export default function StepperCreatePemilu({ active, setActive }: Props) {
         color="#222121">
         <Stepper.Step icon={<PiNotepadBold size="1.1rem" />} />
         <Stepper.Step icon={<FaUserTie size="1.1rem" />} />
-        <Stepper.Step icon={<MdRoomPreferences size="1.1rem" />} />
+        <Stepper.Step icon={<HiEye size="1.1rem" />} />
       </StyledStepper>
     </div>
   )

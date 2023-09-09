@@ -3,6 +3,7 @@ import '@/styles/globals.css';
 import { SessionProvider } from 'next-auth/react';
 import { Provider } from 'react-redux'
 import store from '@/redux/store'
+import { Toaster } from 'react-hot-toast'
 
 export default function App({
   Component,
@@ -11,6 +12,7 @@ export default function App({
   return (
     <SessionProvider session={session}>
       <Provider store={store}>
+        <Toaster />
         <Component {...pageProps} />
       </Provider>
     </SessionProvider>

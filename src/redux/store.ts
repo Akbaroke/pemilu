@@ -5,14 +5,14 @@ export interface RootState {
   CreatePemiluSlice: initialTypeCreatePemilu
 }
 
-const store: Store<RootState> = configureStore({
+const store: Store<unknown | RootState> = configureStore({
   reducer: {
     CreatePemiluSlice: createPemiluSlice,
   },
 })
 
-store.subscribe(() => {
-  console.log('store change:', store.getState())
-})
+// store.subscribe(() => {
+//   console.log('store change:', store.getState())
+// })
 
 export default store

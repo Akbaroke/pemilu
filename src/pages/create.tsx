@@ -6,29 +6,28 @@ import StepperCreatePemilu from '@/components/molecules/StepperCreatePemilu'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '@/redux/store'
 import cn from '@/utils/cn'
-import BilikSuaraForm from '@/components/organisms/BilikSuaraForm'
 import PreviewCreatePemilu from '@/components/organisms/PreviewCreatePemilu'
 import DetailForm from '@/components/molecules/DetailForm'
 import { Checkbox } from '@mantine/core'
 import { useSession } from 'next-auth/react'
 import generateSlug from '@/utils/generateSlug'
-import { OptionType, RoomType } from '@/types/pemilu'
+import { OptionType } from '@/types/pemilu'
 import { useRouter } from 'next/router'
 import { addDoc, collection } from 'firebase/firestore'
 import { firestore, storage } from '@/lib/firebase/init'
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage'
 import { resetFormState } from '@/redux/slices/createPemiluSlice'
+import { notifyError, notifyLoading, notifySuccess } from '@/components/molecules/Toast'
 
-export default function CretePemilu() {
+export default function Create() {
   const dispatch = useDispatch()
   const { data } = useSession()
   const { push } = useRouter()
   const [isChecked, setIsChecked] = React.useState<boolean>(false)
   const [active, setActive] = React.useState<number>(0)
   const [isKandidatsValid, setIsKandidatsValid] = React.useState<boolean>(false)
-  const { detail, kandidats, bilikSuara } = useSelector(
-    (state: RootState) => state.CreatePemiluSlice
-  )
+  const { detail, kandidats } = useSelector((state: RootState) => state.CreatePemiluSlice)
+  const [isLoading, setIsLoading] = React.useState<boolean>(false)
 
   React.useEffect(() => {
     const checkKandidats = () => {
@@ -38,8 +37,6 @@ export default function CretePemilu() {
         isValid = !!detail?.isValid
       } else if (active === 1) {
         isValid = kandidats.every(kandidat => !!kandidat.isValid)
-      } else if (active === 2) {
-        isValid = bilikSuara.every(bilik => !!bilik.isValid)
       } else {
         isValid = isChecked
       }
@@ -47,7 +44,7 @@ export default function CretePemilu() {
       setIsKandidatsValid(isValid)
     }
     checkKandidats()
-  }, [detail, kandidats, bilikSuara, active, isChecked])
+  }, [detail, kandidats, active, isChecked])
 
   React.useEffect(() => {
     return () => dispatch(resetFormState())
@@ -60,17 +57,16 @@ export default function CretePemilu() {
         return <DetailForm />
       case 1:
         return <KandidatForm />
-      case 2:
-        return <BilikSuaraForm />
       default:
         return <PreviewCreatePemilu />
     }
   }
 
   const handleCreatePemilu = async () => {
-    console.log('klik')
+    notifyLoading('Buat diproses...', 'create')
+    setIsLoading(true)
 
-    if (data?.user?.email && detail && kandidats && bilikSuara) {
+    if (data?.user?.email && detail && kandidats) {
       const slug = generateSlug()
       const uploadPromises: any[] = []
       const imageUrls: string[] = []
@@ -103,37 +99,26 @@ export default function CretePemilu() {
           color: kandidat.color,
         }))
 
-        const rooms: RoomType[] = bilikSuara.map(bilik => ({
-          id: bilik.id,
-          prepare: bilik.prepare,
-          timer: bilik.timer,
-        }))
-
         const dataPemilu = {
           emailUserCreated: data.user.email,
           slug: slug,
           name: detail.name,
-          maxQueue: detail.maxQueue,
+          maxVoters: detail.maxVoters,
+          prepareTime: detail.prepareTime,
+          limitTime: detail.limitTime,
           started_at: detail.started_at,
           ended_at: detail.ended_at,
           options: options,
-          rooms: rooms,
         }
 
         await addDoc(collection(firestore, 'pemilu'), dataPemilu)
-
-        console.log({
-          status: true,
-          message: 'Berhasil membuat pemilu',
-        })
-
+        notifySuccess('Berhasil membuat pemilu', 'create')
         push('/')
         dispatch(resetFormState())
       } catch (error) {
-        console.log({
-          status: false,
-          message: error,
-        })
+        notifyError('Gagal membuat pemilu', 'create')
+      } finally {
+        setIsLoading(false)
       }
     }
   }
@@ -145,9 +130,9 @@ export default function CretePemilu() {
         {ContentFrom()}
         <div
           className={cn('flex flex-col', {
-            'gap-1 mt-4': active === 3,
+            'gap-1 mt-4': active === 2,
           })}>
-          {active === 3 ? (
+          {active === 2 ? (
             <Checkbox
               label="Saya yakin data ini sudah benar."
               checked={isChecked}
@@ -159,8 +144,9 @@ export default function CretePemilu() {
           <Button
             className="mt-5"
             isDisabled={!isKandidatsValid}
-            onClick={() => (active === 3 ? handleCreatePemilu() : setActive(active + 1))}>
-            {active === 3 ? 'Selesai' : 'Selanjutnya'}
+            isLoading={isLoading}
+            onClick={() => (active === 2 ? handleCreatePemilu() : setActive(active + 1))}>
+            {active === 2 ? 'Selesai' : 'Selanjutnya'}
           </Button>
         </div>
       </div>

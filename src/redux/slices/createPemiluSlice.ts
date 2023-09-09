@@ -1,16 +1,14 @@
-import { FormBilikSuaraState, FormDetailState, FormKandidatState } from '@/types/pemilu'
+import { FormDetailState, FormKandidatState } from '@/types/pemilu'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 export interface initialTypeCreatePemilu {
   detail: FormDetailState | null
   kandidats: FormKandidatState[]
-  bilikSuara: FormBilikSuaraState[]
 }
 
 const initialState: initialTypeCreatePemilu = {
   detail: null,
   kandidats: [],
-  bilikSuara: [],
 }
 
 const CreatePemiluSlice: any = createSlice({
@@ -29,22 +27,12 @@ const CreatePemiluSlice: any = createSlice({
       state.kandidats = state.kandidats.filter(data => data.id !== action.payload)
     },
 
-    setOrUpdateBilikSuara: (state, action: PayloadAction<FormBilikSuaraState>) => {
-      const index = state.bilikSuara.findIndex(data => data.id === action.payload.id)
-      if (index !== -1) {
-        state.bilikSuara[index] = action.payload
-      } else {
-        state.bilikSuara.push(action.payload)
-      }
-    },
-    deleteBilikSuara: (state, action: PayloadAction<string>) => {
-      state.bilikSuara = state.bilikSuara.filter(data => data.id !== action.payload)
-    },
-
     setDetail: (state, action: PayloadAction<FormDetailState>) => {
       state.detail = {
         name: action.payload.name,
-        maxQueue: action.payload.maxQueue,
+        maxVoters: action.payload.maxVoters,
+        prepareTime: action.payload.prepareTime,
+        limitTime: action.payload.limitTime,
         started_at: action.payload.started_at,
         ended_at: action.payload.ended_at,
         isValid: action.payload.isValid,
@@ -54,7 +42,6 @@ const CreatePemiluSlice: any = createSlice({
     resetFormState: state => {
       state.detail = null
       state.kandidats = []
-      state.bilikSuara = []
     },
   },
 })

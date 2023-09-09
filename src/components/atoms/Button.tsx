@@ -1,4 +1,3 @@
-import React from 'react'
 import { Loader } from '@mantine/core'
 import cn from '@/utils/cn'
 
@@ -9,6 +8,7 @@ interface ButtonProps {
   isLoading?: boolean
   isDisabled?: boolean
   onClick?: () => void
+  icon?: React.ReactNode
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -18,6 +18,7 @@ const Button: React.FC<ButtonProps> = ({
   isLoading,
   isDisabled,
   onClick,
+  icon,
 }) => {
   return (
     <button
@@ -29,12 +30,9 @@ const Button: React.FC<ButtonProps> = ({
         {
           'grid place-items-center opacity-70 shadow-none active:scale-100':
             isLoading || isDisabled,
-        },
-        {
           'cursor-not-allowed': isDisabled,
-        },
-        {
           'cursor-wait': isLoading,
+          'flex items-center gap-[5px] [&>svg]:mb-[2px] [&>svg]:text-[19px]': !!icon,
         }
       )}
       onClick={onClick}>
@@ -43,6 +41,7 @@ const Button: React.FC<ButtonProps> = ({
       ) : (
         children
       )}
+      {icon}
     </button>
   )
 }

@@ -10,7 +10,7 @@ type Props = {
 
 export default function Layout({ title, children, isLogoutBtn, isBackBtn }: Props) {
   return (
-    <div className="w-full h-screen sm:w-[390px] sm:h-[844px] overflow-hidden overflow-y-auto rounded-[10px] m-auto mt-2 shadow-lg">
+    <div className="w-full h-screen sm:w-[390px] sm:h-[844px] overflow-hidden overflow-y-auto rounded-[10px] m-auto mt-2 shadow-lg relative">
       <Topbar isLogoutBtn={isLogoutBtn} isBackBtn={isBackBtn} title={title} />
       <NextNProgress
         showOnShallow={false}

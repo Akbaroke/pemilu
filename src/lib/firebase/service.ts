@@ -5,12 +5,11 @@ import {
   getDocs,
   getFirestore,
   query,
-  setDoc,
   updateDoc,
   where,
 } from 'firebase/firestore'
 import app from './init'
-import bcrypt from 'bcrypt'
+import crypto from 'crypto'
 import { UserData } from '@/interfaces/auth'
 
 const firestore = getFirestore(app)
@@ -25,6 +24,22 @@ export async function getMyPemilu(email: string) {
 
   return data
 }
+export async function getPemiluBySearch(key: string) {
+  const snapshot = await getDocs(collection(firestore, 'pemilu'))
+  const data = snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+  }))
+
+  // Filter data berdasarkan kata kunci
+  const filteredData = data.filter((item: any) => {
+    const searchData = `${item.name} ${item.slug}`.toLowerCase()
+    return searchData.includes(key.toLowerCase())
+  })
+
+  return filteredData
+}
+
 export async function getPemiluBySlug(slug: string) {
   const q = query(collection(firestore, 'pemilu'), where('slug', '==', slug))
   const snapshot = await getDocs(q)
@@ -49,7 +64,12 @@ export async function signUp(userData: UserData, callback: Function) {
       message: 'Email sudah terdaftar',
     })
   } else {
-    userData.password = await bcrypt.hash(userData.password, 10)
+    const salt = process.env.NEXT_PUBLIC_SALT as string
+    const hashedPassword = crypto
+      .createHmac('sha256', salt)
+      .update(userData.password)
+      .digest('hex')
+    userData.password = hashedPassword
     await addDoc(collection(firestore, 'users'), userData)
       .then(() => {
         callback({
