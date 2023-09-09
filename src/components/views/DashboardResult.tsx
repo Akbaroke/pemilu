@@ -8,6 +8,7 @@ import { PemiluDatas } from '@/interfaces/pemilu'
 import Button from '../atoms/Button'
 import { VotersType } from '@/types/pemilu'
 import { useSession } from 'next-auth/react'
+import { Tooltip } from '@mantine/core'
 
 type Props = {
   pemiluDatas: PemiluDatas
@@ -20,6 +21,7 @@ export default function DashboardResult({ pemiluDatas, nextStep }: Props) {
   const [chartOptions, setChartOptions] = React.useState({})
   const [allVoters, setAllVoters] = React.useState<VotersType[]>([])
   const [isAlReadyVoted, setIsAlReadyVoted] = React.useState(false)
+  const [errorDisableVoteBtn, setErrorDisableVoteBtn] = React.useState('Tunggu...')
   const [url, setUrl] = React.useState('')
 
   React.useEffect(() => {
@@ -64,6 +66,22 @@ export default function DashboardResult({ pemiluDatas, nextStep }: Props) {
     setAllVoters(voters)
     setUrl(window.location.href)
   }, [pemiluDatas])
+
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      if (pemiluDatas.started_at >= new Date().getTime()) {
+        setErrorDisableVoteBtn('Pemilu belum dimulai.')
+      } else if (pemiluDatas.ended_at <= new Date().getTime()) {
+        setErrorDisableVoteBtn('Pemilu sudah berakhir.')
+      } else if (allVoters.length > pemiluDatas.maxVoters) {
+        setErrorDisableVoteBtn('Pemilu sudah penuh.')
+      } else {
+        setErrorDisableVoteBtn('')
+      }
+    }, 500)
+
+    return () => clearInterval(interval)
+  }, [allVoters, pemiluDatas])
 
   React.useEffect(() => {
     const userEmail = data?.user?.email
@@ -116,9 +134,20 @@ export default function DashboardResult({ pemiluDatas, nextStep }: Props) {
         </div>
       </div>
       {!isAlReadyVoted ? (
-        <Button className="h-[60px]" onClick={nextStep}>
-          Pilih Sekarang
-        </Button>
+        <Tooltip
+          label={errorDisableVoteBtn}
+          withArrow
+          position="bottom"
+          disabled={errorDisableVoteBtn.length === 0}>
+          <div>
+            <Button
+              className="h-[60px] w-full"
+              onClick={nextStep}
+              isDisabled={errorDisableVoteBtn.length > 0}>
+              Pilih Sekarang
+            </Button>
+          </div>
+        </Tooltip>
       ) : null}
       <div className="border rounded-[10px] p-5 leading-6">
         <h1 className="font-medium text-[14px] text-one">Bagikan tautan :</h1>
