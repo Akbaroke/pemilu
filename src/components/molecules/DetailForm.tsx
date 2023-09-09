@@ -8,7 +8,7 @@ import Input from '../atoms/Input'
 
 type DetailFormType = {
   name: string
-  maxQueue: number
+  maxVoters: number
   started_at: Date
   ended_at: Date
 }
@@ -22,7 +22,7 @@ export default function DetailForm({ DetailValues }: { DetailValues?: DetailForm
     validateInputOnBlur: true,
     initialValues: {
       name: DetailValues?.name || detail?.name || '',
-      maxQueue: DetailValues?.maxQueue || detail?.maxQueue || 0,
+      maxVoters: DetailValues?.maxVoters || detail?.maxVoters || 0,
       started_at: new Date(DetailValues?.started_at || detail?.started_at || 0),
       ended_at: new Date(DetailValues?.ended_at || detail?.ended_at || 0),
     },
@@ -33,9 +33,9 @@ export default function DetailForm({ DetailValues }: { DetailValues?: DetailForm
         }
         return null
       },
-      maxQueue: value => {
-        if (value < 1) {
-          return 'Antrian tidak boleh kurang dari 1.'
+      maxVoters: value => {
+        if (value < 5) {
+          return 'Maximal Pemilih tidak boleh kurang dari 5.'
         }
         return null
       },
@@ -106,13 +106,13 @@ export default function DetailForm({ DetailValues }: { DetailValues?: DetailForm
           onChange={e => form.setFieldValue('name', e as string)}
         />
         <Input
-          label="Maximal Jumlah Antrian"
-          id="maxQueue"
+          label="Maximal Pemilih"
+          id="maxVoters"
           type="number"
           min={0}
-          value={form.values.maxQueue}
-          errorLabel={form.errors.maxQueue as string}
-          onChange={e => form.setFieldValue('maxQueue', e as unknown as number)}
+          value={form.values.maxVoters}
+          errorLabel={form.errors.maxVoters as string}
+          onChange={e => form.setFieldValue('maxVoters', e as unknown as number)}
         />
         <InputDateTime
           label="Dimulai"

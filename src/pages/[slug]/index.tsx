@@ -5,9 +5,8 @@ import { PemiluDatas } from '@/interfaces/pemilu'
 import { useSession } from 'next-auth/react'
 import fetchPemiluData from '@/utils/fetchPemiluData'
 import getPageUrl from '@/utils/getPageUrl'
-import Vote from '@/components/views/Vote'
-import Creater from '@/components/views/Creater'
 import usePemiluDatasSnapshot from '@/hooks/usePemiluDataSnapshot'
+import Vote from '@/components/views/Vote'
 
 export default function Index({ pemiluDatas }: { pemiluDatas: PemiluDatas }) {
   const router = useRouter()
@@ -17,11 +16,7 @@ export default function Index({ pemiluDatas }: { pemiluDatas: PemiluDatas }) {
 
   return (
     <Layout isBackBtn title="Detail Pemilu">
-      {pemiluDatasUptodate.emailUserCreated === data?.user?.email ? (
-        <Creater pemiluDatas={pemiluDatasUptodate} />
-      ) : (
-        <Vote pemiluDatas={pemiluDatasUptodate} />
-      )}
+      <Vote pemiluDatas={pemiluDatasUptodate} />
     </Layout>
   )
 }
@@ -50,12 +45,7 @@ export async function getServerSideProps(context: { query: { slug: string } } | 
 
   return {
     props: {
-      pemiluDatas:
-        {
-          ...pemiluDatas,
-          started_at: pemiluDatas.started_at,
-          ended_at: pemiluDatas.ended_at,
-        } || '',
+      pemiluDatas,
     },
   }
 }

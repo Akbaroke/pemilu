@@ -45,7 +45,7 @@ export default function Setting({ pemiluDatas }: { pemiluDatas: PemiluDatas }) {
       const pemiluRef = doc(firestore, 'pemilu', id)
       const dataPemilu = {
         name: detail?.name,
-        maxQueue: detail?.maxQueue,
+        maxVoters: detail?.maxVoters,
         started_at: detail?.started_at,
         ended_at: detail?.ended_at,
       }
@@ -107,7 +107,7 @@ export default function Setting({ pemiluDatas }: { pemiluDatas: PemiluDatas }) {
       <DetailForm
         DetailValues={{
           name: pemiluDatas.name,
-          maxQueue: pemiluDatas.maxQueue,
+          maxVoters: pemiluDatas.maxVoters,
           started_at: pemiluDatas.started_at,
           ended_at: pemiluDatas.ended_at,
         }}
@@ -157,12 +157,7 @@ export async function getServerSideProps(context: { query: { slug: string } } | 
 
   return {
     props: {
-      pemiluDatas:
-        {
-          ...pemiluDatas,
-          started_at: pemiluDatas.started_at,
-          ended_at: pemiluDatas.ended_at,
-        } || '',
+      pemiluDatas,
     },
   }
 }

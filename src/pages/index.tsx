@@ -1,14 +1,14 @@
-import * as React from 'react';
+import * as React from 'react'
 import SearchInput from '@/components/atoms/SearchInput'
-import PEMILU_IMAGE from '@/assets/pemilu-image.png';
-import Image from 'next/image';
-import { BiTimer } from 'react-icons/bi';
-import { FiPlus } from 'react-icons/fi';
-import formatCustomDate from '@/utils/formatCustomDate';
-import Link from 'next/link';
+import PEMILU_IMAGE from '@/assets/pemilu-image.png'
+import Image from 'next/image'
+import { BiTimer } from 'react-icons/bi'
+import { FiPlus } from 'react-icons/fi'
+import formatCustomDate from '@/utils/formatCustomDate'
+import Link from 'next/link'
 import Layout from '@/components/templates/Layout'
 import { Loader, Tooltip } from '@mantine/core'
-import { getMyPemilu, getPemiluBySearch } from '@/lib/firebase/service'
+import { getMyPemilu } from '@/lib/firebase/service'
 import { PemiluDatas } from '@/interfaces/pemilu'
 import { getToken } from 'next-auth/jwt'
 import { NextApiRequest, NextPageContext } from 'next'
@@ -42,7 +42,7 @@ export default function Home({ listPemilu }: { listPemilu: PemiluDatas[] }) {
       setIsSearching(false)
       setPemiluResults(null)
     }
-    
+
     return () => {
       clearTimeout(timeout)
     }
@@ -90,9 +90,13 @@ export default function Home({ listPemilu }: { listPemilu: PemiluDatas[] }) {
                 <div className="flex flex-col justify-between gap-1">
                   <h1 className="text-one text-[14px] font-semibold">{pemilu.name}</h1>
                   <ul className="text-one text-[12px] font-medium leading-5">
-                    <li>{pemilu?.options?.length || 0} Pilihan</li>
-                    <li>{pemilu?.rooms?.length || 0} Bilik Suara</li>
-                    <li>{pemilu?.queue?.length || 0} Antrian</li>
+                    <li>{pemilu?.options?.length || 0} Kandidat</li>
+                    <li>
+                      {pemilu.options.flatMap(val =>
+                        val.voters ? val.voters.map(voter => voter.email) : []
+                      )?.length || 0}{' '}
+                      Pemilih
+                    </li>
                   </ul>
                   <div className="flex items-center gap-1 text-three text-[12px]">
                     <BiTimer size={16} />
@@ -107,13 +111,19 @@ export default function Home({ listPemilu }: { listPemilu: PemiluDatas[] }) {
           )
         ) : (
           <>
-            <Tooltip label="Buat Pemilu" withArrow position="bottom">
-              <Link
-                href="/pemilu"
-                className="rounded-[10px] border border-dashed border-two p-[15px] flex items-center justify-center gap-4 hover:shadow-md transition-all duration-300 cursor-pointer text-three">
-                <FiPlus size={30} />
-              </Link>
-            </Tooltip>
+            {pemiluDatasUptodate.length < 3 ? (
+              <Tooltip label="Buat Pemilu" withArrow position="bottom">
+                <Link
+                  href="/create"
+                  className="rounded-[10px] border border-dashed border-two p-[15px] flex items-center justify-center gap-4 hover:shadow-md transition-all duration-300 cursor-pointer text-three">
+                  <FiPlus size={30} />
+                </Link>
+              </Tooltip>
+            ) : (
+              <p className="m-auto text-[12px] text-danger">
+                `Buat pemilu sudah batas maksimal (3)`
+              </p>
+            )}
             {pemiluDatasUptodate?.map(pemilu => (
               <Link
                 href={`/${pemilu.slug}`}
@@ -127,16 +137,27 @@ export default function Home({ listPemilu }: { listPemilu: PemiluDatas[] }) {
                 <div className="flex flex-col justify-between gap-1">
                   <h1 className="text-one text-[14px] font-semibold">{pemilu.name}</h1>
                   <ul className="text-one text-[12px] font-medium leading-5">
-                    <li>{pemilu?.options?.length || 0} Pilihan</li>
-                    <li>{pemilu?.rooms?.length || 0} Bilik Suara</li>
-                    <li>{pemilu?.queue?.length || 0} Antrian</li>
+                    <li>{pemilu?.options?.length || 0} Kandidat</li>
+                    <li>
+                      {pemilu.options.flatMap(val =>
+                        val.voters ? val.voters.map(voter => voter.email) : []
+                      )?.length || 0}{' '}
+                      Pemilih
+                    </li>
                   </ul>
                   <div className="flex items-center gap-1 text-three text-[12px]">
                     <BiTimer size={16} />
-                    <p>
-                      Berakhir{' '}
-                      {formatCustomDate(new Date(pemilu.started_at) || new Date())}
-                    </p>
+                    {pemilu.started_at < new Date().getTime() ? (
+                      <p>
+                        Berakhir{' '}
+                        {formatCustomDate(new Date(pemilu.ended_at) || new Date())}
+                      </p>
+                    ) : (
+                      <p>
+                        Dimulai{' '}
+                        {formatCustomDate(new Date(pemilu.started_at) || new Date())}
+                      </p>
+                    )}
                   </div>
                 </div>
               </Link>
@@ -159,11 +180,7 @@ export async function getServerSideProps(context: NextPageContext) {
 
   return {
     props: {
-      listPemilu: listPemilu.map((pemilu: any) => ({
-        ...pemilu,
-        started_at: pemilu.started_at,
-        ended_at: pemilu.ended_at,
-      })),
+      listPemilu,
     },
   }
 }
