@@ -12,6 +12,7 @@ import Timer from '../molecules/Timer'
 import RadioCheck from '../atoms/RadioCheck'
 import cn from '@/utils/cn'
 import DashboardResult from './DashboardResult'
+import { notifyError, notifyLoading, notifySuccess } from '../molecules/Toast'
 
 type StepperViewProps = {
   pemiluDatas: PemiluDatas
@@ -43,6 +44,7 @@ function Voted({ pemiluDatas, backStep }: StepperViewProps) {
   const [kandidatSelected, setKandidatSelected] = React.useState<string>('')
 
   const handleSaveKandidatSelected = async () => {
+    notifyLoading('Simpan diproses...', 'vote')
     try {
       setIsLoading(true)
 
@@ -81,19 +83,10 @@ function Voted({ pemiluDatas, backStep }: StepperViewProps) {
         }),
       }
       await setDoc(pemiluRef, newUpdate, { merge: true })
-      console.log(newUpdate)
-
-      console.log({
-        status: true,
-        message: 'Berhasil menyimpan suara',
-      })
+      notifySuccess('Berhasil menyimpan pilihan', 'vote')
       backStep && backStep()
     } catch (error) {
-      console.log({
-        status: false,
-        message: 'Gagal menyimpan suara',
-        error: error,
-      })
+      notifyError('Gagal menyimpan pilihan', 'vote')
     } finally {
       setIsLoading(false)
     }

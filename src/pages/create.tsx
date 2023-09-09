@@ -17,6 +17,7 @@ import { addDoc, collection } from 'firebase/firestore'
 import { firestore, storage } from '@/lib/firebase/init'
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage'
 import { resetFormState } from '@/redux/slices/createPemiluSlice'
+import { notifyError, notifyLoading, notifySuccess } from '@/components/molecules/Toast'
 
 export default function Create() {
   const dispatch = useDispatch()
@@ -62,7 +63,7 @@ export default function Create() {
   }
 
   const handleCreatePemilu = async () => {
-    console.log('klik')
+    notifyLoading('Buat diproses...', 'create')
     setIsLoading(true)
 
     if (data?.user?.email && detail && kandidats) {
@@ -109,19 +110,11 @@ export default function Create() {
         }
 
         await addDoc(collection(firestore, 'pemilu'), dataPemilu)
-
-        console.log({
-          status: true,
-          message: 'Berhasil membuat pemilu',
-        })
-
+        notifySuccess('Berhasil membuat pemilu', 'create')
         push('/')
         dispatch(resetFormState())
       } catch (error) {
-        console.log({
-          status: false,
-          message: error,
-        })
+        notifyError('Gagal membuat pemilu', 'create')
       } finally {
         setIsLoading(false)
       }

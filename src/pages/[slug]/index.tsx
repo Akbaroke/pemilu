@@ -11,7 +11,6 @@ import Vote from '@/components/views/Vote'
 export default function Index({ pemiluDatas }: { pemiluDatas: PemiluDatas }) {
   const router = useRouter()
   const { slug } = router.query
-  const { data } = useSession()
   const pemiluDatasUptodate = usePemiluDatasSnapshot(slug as string, pemiluDatas)
 
   return (
