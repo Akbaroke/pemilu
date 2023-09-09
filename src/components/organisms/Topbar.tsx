@@ -16,7 +16,7 @@ export default function Topbar({ title, isLogoutBtn, isBackBtn }: Props) {
   const router = useRouter()
 
   return (
-    <div className="bg-white shadow-sm h-[60px] px-[25px] flex justify-between items-center sticky top-0 z-50">
+    <div className="bg-white shadow-sm h-[60px] px-[25px] flex justify-between items-center sticky top-0 z-40">
       <div className="flex items-center gap-4">
         {isBackBtn ? (
           <Tooltip label="Back" withArrow position="bottom">

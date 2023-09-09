@@ -99,6 +99,8 @@ export default function Setting({ pemiluDatas }: { pemiluDatas: PemiluDatas }) {
         DetailValues={{
           name: pemiluDatas.name,
           maxVoters: pemiluDatas.maxVoters,
+          prepareTime: pemiluDatas.prepareTime,
+          limitTime: pemiluDatas.limitTime,
           started_at: new Date(pemiluDatas.started_at),
           ended_at: new Date(pemiluDatas.ended_at),
         }}

@@ -1,18 +1,20 @@
 import * as React from 'react'
 import Image from 'next/image'
 import { GiVote } from 'react-icons/gi'
+import { CgSandClock } from 'react-icons/cg'
 import Button from '../atoms/Button'
 import { PemiluDatas } from '@/interfaces/pemilu'
-import formatCustomDate from '@/utils/formatCustomDate'
 import usePemiluDatasSnapshot from '@/hooks/usePemiluDataSnapshot'
 import { collection, doc, getDocs, query, setDoc, where } from 'firebase/firestore'
 import { firestore } from '@/lib/firebase/init'
 import { useSession } from 'next-auth/react'
-import Timer from '../molecules/Timer'
 import RadioCheck from '../atoms/RadioCheck'
 import cn from '@/utils/cn'
 import DashboardResult from './DashboardResult'
 import { notifyError, notifyLoading, notifySuccess } from '../molecules/Toast'
+import LayerPrepare from '../molecules/LayerPrepare'
+import useCountdown from '@/hooks/useCountdown'
+import { useRouter } from 'next/router'
 
 type StepperViewProps = {
   pemiluDatas: PemiluDatas
@@ -40,8 +42,35 @@ export default function Vote({ pemiluDatas }: { pemiluDatas: PemiluDatas }) {
 
 function Voted({ pemiluDatas, backStep }: StepperViewProps) {
   const { data } = useSession()
+  const { push } = useRouter()
+  const { second, setSecond } = useCountdown(pemiluDatas.prepareTime)
+  const [prepare, setPrepare] = React.useState(pemiluDatas.prepareTime)
+  const [limit, setLimit] = React.useState(pemiluDatas.limitTime)
   const [isLoading, setIsLoading] = React.useState(false)
   const [kandidatSelected, setKandidatSelected] = React.useState<string>('')
+
+  React.useEffect(() => {
+    if (prepare === 0) {
+      setLimit(second)
+    } else {
+      if (second === 0) {
+        setSecond(pemiluDatas.limitTime)
+      }
+      setPrepare(second)
+    }
+    if (second === 0 && limit === 0) {
+      notifyError('Maaf, Waktu sudah habis silahkan coba lagi.', 'vote')
+      push('/')
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [second])
+
+  React.useEffect(() => {
+    if (limit === 0) {
+      notifyError('Maaf, Waktu sudah habis silahkan coba lagi.', 'vote')
+      push('/')
+    }
+  }, [limit, push])
 
   const handleSaveKandidatSelected = async () => {
     notifyLoading('Simpan diproses...', 'vote')
@@ -94,6 +123,9 @@ function Voted({ pemiluDatas, backStep }: StepperViewProps) {
 
   return (
     <div>
+      {prepare === 0 ? null : (
+        <LayerPrepare prepare={prepare} limit={pemiluDatas.limitTime} />
+      )}
       <h1 className="font-bold text-[20px] text-one capitalize">{pemiluDatas.name}</h1>
       <div className="flex flex-col gap-2 mt-4">
         {pemiluDatas.options.map((val, index) => (
@@ -126,6 +158,16 @@ function Voted({ pemiluDatas, backStep }: StepperViewProps) {
             </div>
           </div>
         ))}
+        <p className="m-auto text-center mt-2 text-[12px] text-one font-medium flex gap-1 items-center [&>svg]:text-three">
+          <CgSandClock size={17} />
+          <b
+            className={cn({
+              'text-danger animate-ping': limit <= 3,
+            })}>
+            {limit}
+          </b>{' '}
+          detik
+        </p>
       </div>
       <Button
         icon={<GiVote />}

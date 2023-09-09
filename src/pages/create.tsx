@@ -104,6 +104,8 @@ export default function Create() {
           slug: slug,
           name: detail.name,
           maxVoters: detail.maxVoters,
+          prepareTime: detail.prepareTime,
+          limitTime: detail.limitTime,
           started_at: detail.started_at,
           ended_at: detail.ended_at,
           options: options,

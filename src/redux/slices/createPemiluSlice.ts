@@ -31,6 +31,8 @@ const CreatePemiluSlice: any = createSlice({
       state.detail = {
         name: action.payload.name,
         maxVoters: action.payload.maxVoters,
+        prepareTime: action.payload.prepareTime,
+        limitTime: action.payload.limitTime,
         started_at: action.payload.started_at,
         ended_at: action.payload.ended_at,
         isValid: action.payload.isValid,

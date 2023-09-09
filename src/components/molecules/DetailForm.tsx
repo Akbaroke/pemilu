@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { isNotEmpty, useForm } from '@mantine/form'
+import { useForm } from '@mantine/form'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '@/redux/store'
 import InputDateTime from '../atoms/InputDateTime'
@@ -9,6 +9,8 @@ import Input from '../atoms/Input'
 type DetailFormType = {
   name: string
   maxVoters: number
+  prepareTime: number
+  limitTime: number
   started_at: Date
   ended_at: Date
 }
@@ -23,6 +25,8 @@ export default function DetailForm({ DetailValues }: { DetailValues?: DetailForm
     initialValues: {
       name: DetailValues?.name || detail?.name || '',
       maxVoters: DetailValues?.maxVoters || detail?.maxVoters || 0,
+      prepareTime: DetailValues?.prepareTime || detail?.prepareTime || 0,
+      limitTime: DetailValues?.limitTime || detail?.limitTime || 0,
       started_at: new Date(DetailValues?.started_at || detail?.started_at || 0),
       ended_at: new Date(DetailValues?.ended_at || detail?.ended_at || 0),
     },
@@ -35,7 +39,21 @@ export default function DetailForm({ DetailValues }: { DetailValues?: DetailForm
       },
       maxVoters: value => {
         if (value < 5) {
-          return 'Maximal Pemilih tidak boleh kurang dari 5.'
+          return 'Maximal Pemilih tidak boleh kurang dari 5 orang.'
+        }
+        return null
+      },
+      prepareTime: value => {
+        if (value < 3) {
+          return 'Waktu persiapan tidak boleh kurang dari 3 detik.'
+        } else if (value > 30) {
+          return 'Waktu persiapan tidak boleh lebih dari 30 detik.'
+        }
+        return null
+      },
+      limitTime: value => {
+        if (value < 10) {
+          return 'Waktu persiapan tidak boleh kurang dari 10 detik.'
         }
         return null
       },
@@ -113,6 +131,24 @@ export default function DetailForm({ DetailValues }: { DetailValues?: DetailForm
           value={form.values.maxVoters}
           errorLabel={form.errors.maxVoters as string}
           onChange={e => form.setFieldValue('maxVoters', e as unknown as number)}
+        />
+        <Input
+          label="Waktu Persiapan (detik)"
+          id="prepareTime"
+          type="number"
+          min={0}
+          value={form.values.prepareTime}
+          errorLabel={form.errors.prepareTime as string}
+          onChange={e => form.setFieldValue('prepareTime', e as unknown as number)}
+        />
+        <Input
+          label="Batas Waktu (detik)"
+          id="limitTime"
+          type="number"
+          min={0}
+          value={form.values.limitTime}
+          errorLabel={form.errors.limitTime as string}
+          onChange={e => form.setFieldValue('limitTime', e as unknown as number)}
         />
         <InputDateTime
           label="Dimulai"
