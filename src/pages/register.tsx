@@ -106,7 +106,7 @@ export default function Register() {
           />
         </div>
         <Button type="submit" isLoading={isLoading} className="text-white mt-4">
-          Register
+          Daftar
         </Button>
       </form>
       <div className="flex flex-col items-center justify-center gap-[10px] font-medium text-[14px] text-one mt-10">
