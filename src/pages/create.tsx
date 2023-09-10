@@ -18,6 +18,9 @@ import { firestore, storage } from '@/lib/firebase/init'
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage'
 import { resetFormState } from '@/redux/slices/createPemiluSlice'
 import { notifyError, notifyLoading, notifySuccess } from '@/components/molecules/Toast'
+import { getToken } from 'next-auth/jwt'
+import { NextApiRequest, NextPageContext } from 'next'
+import { getMyPemilu } from '@/lib/firebase/service'
 
 export default function Create() {
   const dispatch = useDispatch()
@@ -69,21 +72,27 @@ export default function Create() {
     if (data?.user?.email && detail && kandidats) {
       const slug = generateSlug()
       const uploadPromises: any[] = []
-      const imageUrls: string[] = []
+      const imageUrls: {
+        id: string
+        url: string
+      }[] = []
 
       kandidats.forEach(kandidat => {
-        const storageRef = ref(storage, `kandidat/${slug}/${kandidat.id}.jpg`)
+        const id = kandidat.id
+        const storageRef = ref(storage, `kandidat/${slug}/${id}.jpg`)
 
         const uploadPromise = uploadBytes(storageRef, kandidat.image.file)
           .then(snapshot => {
             return getDownloadURL(storageRef)
           })
           .then(downloadURL => {
-            console.log(`File ${kandidat.id}.jpg berhasil diupload!`)
-            imageUrls.push(downloadURL)
+            imageUrls.push({
+              id: id,
+              url: downloadURL,
+            })
           })
           .catch(error => {
-            console.error(`Error mengupload file ${kandidat.id}.jpg: `, error)
+            console.error(`Error mengupload file ${id}.jpg: `, error)
           })
 
         uploadPromises.push(uploadPromise)
@@ -92,12 +101,18 @@ export default function Create() {
       try {
         await Promise.all(uploadPromises)
 
-        const options: OptionType[] = kandidats.map((kandidat, index) => ({
-          id: kandidat.id,
-          name: kandidat.name,
-          imageUrl: imageUrls[index],
-          color: kandidat.color,
-        }))
+        const options: OptionType[] = kandidats.map(kandidat => {
+          const imageUrlObject = imageUrls.find(val => val.id === kandidat.id)
+          const imageUrl = imageUrlObject ? imageUrlObject.url : ''
+
+          return {
+            id: kandidat.id,
+            name: kandidat.name,
+            imageUrl: imageUrl,
+            color: kandidat.color,
+          }
+        })
+
 
         const dataPemilu = {
           emailUserCreated: data.user.email,
@@ -113,7 +128,7 @@ export default function Create() {
 
         await addDoc(collection(firestore, 'pemilu'), dataPemilu)
         notifySuccess('Berhasil membuat pemilu', 'create')
-        push('/')
+        await push('/')
         dispatch(resetFormState())
       } catch (error) {
         notifyError('Gagal membuat pemilu', 'create')
@@ -152,4 +167,27 @@ export default function Create() {
       </div>
     </Layout>
   )
+}
+
+export async function getServerSideProps(context: NextPageContext) {
+  const { req } = context as unknown as { req: NextApiRequest }
+
+  const token = await getToken({
+    req,
+    secret: process.env.NEXTAUTH_SECRET,
+  })
+  const listPemilu = await getMyPemilu(token?.email as string)
+
+  if (listPemilu.length >= 3) {
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    }
+  }
+
+  return {
+    props: {},
+  }
 }

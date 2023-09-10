@@ -1,7 +1,7 @@
-import { useRouter } from 'next/router';
-import { AiOutlineLogout } from 'react-icons/ai';
-import { IoIosArrowBack } from 'react-icons/io';
-import { Tooltip } from '@mantine/core';
+import { useRouter } from 'next/router'
+import { AiOutlineLogout } from 'react-icons/ai'
+import { IoIosArrowBack } from 'react-icons/io'
+import { Tooltip } from '@mantine/core'
 import { signOut } from 'next-auth/react'
 import Image from 'next/image'
 import LOGO from '@/assets/logo.png'
@@ -15,12 +15,19 @@ type Props = {
 export default function Topbar({ title, isLogoutBtn, isBackBtn }: Props) {
   const router = useRouter()
 
+  const handleGoBack = () => {
+    const currentPath = router.asPath
+    const pathsArray = currentPath.split('/').filter(Boolean)
+    const newPath = pathsArray.slice(0, -1).join('/')
+    router.push(`/${newPath}`)
+  }
+
   return (
     <div className="bg-white shadow-sm h-[60px] px-[25px] flex justify-between items-center sticky top-0 z-40">
       <div className="flex items-center gap-4">
         {isBackBtn ? (
           <Tooltip label="Back" withArrow position="bottom">
-            <div onClick={() => router.back()} className="cursor-pointer">
+            <div onClick={handleGoBack} className="cursor-pointer">
               <IoIosArrowBack size={18} />
             </div>
           </Tooltip>
