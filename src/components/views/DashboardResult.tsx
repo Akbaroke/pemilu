@@ -93,7 +93,7 @@ export default function DashboardResult({ pemiluDatas, nextStep }: Props) {
 
   return (
     <div className="flex flex-col gap-[25px]">
-      <h1 className="font-bold text-[20px] text-one">{pemiluDatas.name}</h1>
+      <h1 className="font-bold text-[20px] text-one capitalize">{pemiluDatas.name}</h1>
       <div className="flex flex-col gap-5 border rounded-[10px] p-5">
         {allVoters.length > 0 ? (
           <div>
@@ -123,7 +123,9 @@ export default function DashboardResult({ pemiluDatas, nextStep }: Props) {
                   className="w-[71px] h-[71px]"
                 />
                 <div className="leading-2">
-                  <h1 className="font-semibold text-[14px] text-one">{value.name}</h1>
+                  <h1 className="font-semibold text-[14px] text-one capitalize">
+                    {value.name}
+                  </h1>
                   <p className="font-medium text-[12px] text-one">
                     Memperoleh {value.voters ? value.voters.length : 0} suara
                   </p>

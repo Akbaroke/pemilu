@@ -1,10 +1,6 @@
 import * as React from 'react'
 import SearchInput from '@/components/atoms/SearchInput'
-import PEMILU_IMAGE from '@/assets/pemilu-image.png'
-import Image from 'next/image'
-import { BiTimer } from 'react-icons/bi'
 import { FiPlus } from 'react-icons/fi'
-import formatCustomDate from '@/utils/formatCustomDate'
 import Link from 'next/link'
 import Layout from '@/components/templates/Layout'
 import { Loader, Tooltip } from '@mantine/core'
@@ -15,6 +11,7 @@ import { NextApiRequest, NextPageContext } from 'next'
 import { collection, getDocs } from 'firebase/firestore'
 import { firestore } from '@/lib/firebase/init'
 import useAllPemiluSnapshot from '@/hooks/useAllPemiluSnapshot'
+import CardListPemilu from '@/components/molecules/CardListPemilu'
 
 export default function Home({ listPemilu }: { listPemilu: PemiluDatas[] }) {
   const [search, setSearch] = React.useState<string>('')
@@ -78,35 +75,7 @@ export default function Home({ listPemilu }: { listPemilu: PemiluDatas[] }) {
             </div>
           ) : (
             pemiluResults?.map(pemilu => (
-              <Link
-                href={`/${pemilu.slug}`}
-                key={pemilu.slug}
-                className="rounded-[10px] border border-two p-4 flex items-center gap-4 shadow-md hover:shadow-sm transition-all duration-300 cursor-pointer">
-                <Image
-                  src={PEMILU_IMAGE}
-                  alt="image pemilu"
-                  className="w-[101px] h-[96px]"
-                />
-                <div className="flex flex-col justify-between gap-1">
-                  <h1 className="text-one text-[14px] font-semibold">{pemilu.name}</h1>
-                  <ul className="text-one text-[12px] font-medium leading-5">
-                    <li>{pemilu?.options?.length || 0} Kandidat</li>
-                    <li>
-                      {pemilu.options.flatMap(val =>
-                        val.voters ? val.voters.map(voter => voter.email) : []
-                      )?.length || 0}{' '}
-                      Pemilih
-                    </li>
-                  </ul>
-                  <div className="flex items-center gap-1 text-three text-[12px]">
-                    <BiTimer size={16} />
-                    <p>
-                      Berakhir{' '}
-                      {formatCustomDate(new Date(pemilu.started_at) || new Date())}
-                    </p>
-                  </div>
-                </div>
-              </Link>
+              <CardListPemilu key={pemilu.slug} pemilu={pemilu} />
             ))
           )
         ) : (
@@ -125,42 +94,7 @@ export default function Home({ listPemilu }: { listPemilu: PemiluDatas[] }) {
               </p>
             )}
             {pemiluDatasUptodate?.map(pemilu => (
-              <Link
-                href={`/${pemilu.slug}`}
-                key={pemilu.slug}
-                className="rounded-[10px] border border-two p-4 flex items-center gap-4 shadow-md hover:shadow-sm transition-all duration-300 cursor-pointer">
-                <Image
-                  src={PEMILU_IMAGE}
-                  alt="image pemilu"
-                  className="w-[101px] h-[96px]"
-                />
-                <div className="flex flex-col justify-between gap-1">
-                  <h1 className="text-one text-[14px] font-semibold">{pemilu.name}</h1>
-                  <ul className="text-one text-[12px] font-medium leading-5">
-                    <li>{pemilu?.options?.length || 0} Kandidat</li>
-                    <li>
-                      {pemilu.options.flatMap(val =>
-                        val.voters ? val.voters.map(voter => voter.email) : []
-                      )?.length || 0}{' '}
-                      Pemilih
-                    </li>
-                  </ul>
-                  <div className="flex items-center gap-1 text-three text-[12px]">
-                    <BiTimer size={16} />
-                    {pemilu.started_at < new Date().getTime() ? (
-                      <p>
-                        Berakhir{' '}
-                        {formatCustomDate(new Date(pemilu.ended_at) || new Date())}
-                      </p>
-                    ) : (
-                      <p>
-                        Dimulai{' '}
-                        {formatCustomDate(new Date(pemilu.started_at) || new Date())}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </Link>
+              <CardListPemilu key={pemilu.slug} pemilu={pemilu} />
             ))}
           </>
         )}

@@ -51,32 +51,30 @@ export default function CardFormKandidat({ number, handleDeleteButton }: Props) 
   })
 
   React.useEffect(() => {
-    if (imageFile) {
-      if (form.isValid()) {
-        dispatch(
-          setOrUpdateKandidats({
-            ...form.values,
-            isValid: true,
-            id: number.toString(),
-            image: {
-              url: form.values.image,
-              file: imageFile,
-            },
-          })
-        )
-      } else {
-        dispatch(
-          setOrUpdateKandidats({
-            ...form.values,
-            isValid: false,
-            id: number.toString(),
-            image: {
-              url: form.values.image,
-              file: imageFile,
-            },
-          })
-        )
-      }
+    if (form.isValid()) {
+      dispatch(
+        setOrUpdateKandidats({
+          ...form.values,
+          isValid: true,
+          id: number.toString(),
+          image: {
+            url: form.values.image,
+            file: imageFile,
+          },
+        })
+      )
+    } else {
+      dispatch(
+        setOrUpdateKandidats({
+          ...form.values,
+          isValid: false,
+          id: number.toString(),
+          image: {
+            url: form.values.image,
+            file: imageFile,
+          },
+        })
+      )
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.values])
