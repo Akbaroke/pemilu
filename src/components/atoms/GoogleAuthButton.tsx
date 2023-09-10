@@ -12,7 +12,7 @@ export default function GoogleAuthButton({ title }: { title: string }) {
   return (
     <button
       type="button"
-      className="text-one font-medium text-[14px] flex justify-center items-center gap-[10px] border border-two w-full h-[37px] rounded-[10px] hover:shadow-md transition-all duration-300"
+      className="text-one font-medium text-[14px] flex justify-center items-center gap-[10px] border border-two w-full h-[45px] rounded-[10px] hover:shadow-md transition-all duration-300"
       onClick={() => {
         setIsLoading(true)
         signIn('google', {

@@ -114,7 +114,7 @@ export default function DetailForm({ DetailValues }: { DetailValues?: DetailForm
       <div className="pb-2 border-b ">
         <h1 className="text-one font-bold text-[20px]">Detail Pemilu</h1>
       </div>
-      <div>
+      <div className="flex flex-col">
         <Input
           label="Nama/Jenis Pemilu"
           id="name"

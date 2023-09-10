@@ -43,7 +43,7 @@ const Input: React.FC<InputProps> = ({
         onChange={e => onChange(e.target.value)}
         disabled={isLoading || disabled}
         maxLength={maxLength}
-        className={`border border-[#EFF0F0] rounded-[10px] h-[37px] pl-3 text-[14px] font-medium text-one outline-none ${
+        className={`border border-[#EFF0F0] rounded-[10px] h-[45px] pl-3 text-[14px] font-medium text-one outline-none ${
           disabled ? 'bg-[#F4F5F7]' : ''
         }`}
       />
