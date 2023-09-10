@@ -149,7 +149,9 @@ function Voted({ pemiluDatas, backStep }: StepperViewProps) {
             />
             <div className="flex justify-between items-center flex-1">
               <div className="leading-2">
-                <h1 className="font-semibold text-[14px] text-one">{val.name}</h1>
+                <h1 className="font-semibold text-[14px] text-one capitalize">
+                  {val.name}
+                </h1>
                 <p className="font-medium text-[12px] text-one">
                   Memperoleh {val.voters ? val.voters.length : 0} suara
                 </p>

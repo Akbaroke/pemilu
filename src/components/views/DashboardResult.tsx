@@ -165,13 +165,15 @@ export default function DashboardResult({ pemiluDatas, nextStep }: Props) {
         <div className="border rounded-[10px] p-5 leading-6">
           <h1 className="font-medium text-[14px] text-one">Daftar Pemilih :</h1>
           <div className="leading-7 pl-2 mt-1">
-            {allVoters.map((value, index) => (
-              <p key={index} className="font-medium text-[14px] text-one">
-                {index + 1}
-                {`. `}
-                {value.name}
-              </p>
-            ))}
+            {allVoters
+              .sort((a, b) => a.time - b.time)
+              .map((value, index) => (
+                <p key={index} className="font-medium text-[14px] text-one">
+                  {index + 1}
+                  {`. `}
+                  {value.name}
+                </p>
+              ))}
           </div>
         </div>
       ) : null}
