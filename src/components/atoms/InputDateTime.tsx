@@ -40,7 +40,7 @@ const InputDateTime: React.FC<InputProps> = ({
         minDate={minDate}
         onChange={(value: DateValue) => onChange(value)}
         disabled={isLoading || disabled}
-        className={`border border-[#EFF0F0] rounded-[10px] h-[37px] pl-3 pt-1 text-[14px] font-normal text-one outline-none ${
+        className={`border border-[#EFF0F0] rounded-[10px] h-[45px] pl-3 pt-1 text-[14px] font-normal text-one outline-none ${
           disabled ? 'bg-[#F4F5F7]' : ''
         }`}
       />

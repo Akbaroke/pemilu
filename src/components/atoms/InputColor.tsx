@@ -34,7 +34,7 @@ const InputColor: React.FC<InputProps> = ({
         onChange={e => onChange(e)}
         value={value}
         withAsterisk
-        className={`border border-[#EFF0F0] rounded-[10px] h-[37px] text-[14px] font-medium text-one outline-none ${
+        className={`border border-[#EFF0F0] rounded-[10px] h-[45px] text-[14px] font-medium text-one outline-none py-1 px-1 ${
           disabled ? 'bg-[#F4F5F7]' : ''
         }`}
       />
